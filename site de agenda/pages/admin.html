@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#050505" />
+  <title>Admin — Barbeiro Barril</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    /* ── LOGIN ── */
+    .login-screen {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 24px; gap: 20px;
+    }
+    .login-logo { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 800; text-align: center; }
+    .login-subtitle { color: var(--muted); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; font-weight: 700; text-align: center; margin-top: -10px; }
+    .login-card { width: 100%; max-width: 380px; padding: 32px 28px; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line); }
+    .login-card h2 { margin-bottom: 6px; font-size: 20px; }
+    .login-card .login-hint { color: var(--text2); font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
+    .pin-input { text-align: center; font-size: 26px; font-weight: 900; letter-spacing: 0.3em; }
+    .login-default { text-align: center; color: var(--muted); font-size: 12px; margin-top: 14px; }
+
+    /* ── LAYOUT ── */
+    body.admin-body { padding-bottom: calc(68px + var(--safe-bottom)); }
+    @media (min-width: 768px) { body.admin-body { padding-bottom: 0; } }
+
+    .admin-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+      height: calc(58px + var(--safe-top));
+      padding: var(--safe-top) 20px 0;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(5,5,5,0.92); backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--line);
+    }
+    .admin-header-left .admin-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 800; line-height: 1.2; }
+    .admin-header-left .admin-sub { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+    .admin-header-right { display: flex; align-items: center; gap: 8px; }
+
+    .desktop-tabs { display: none; align-items: center; gap: 2px; }
+    .dt-btn {
+      padding: 8px 14px; border-radius: var(--radius-sm); background: transparent;
+      border: none; color: var(--text2); font-size: 14px; font-weight: 700; cursor: pointer;
+      transition: color var(--transition), background var(--transition);
+    }
+    .dt-btn.active, .dt-btn:hover { color: var(--accent); background: var(--surface2); }
+
+    @media (min-width: 768px) {
+      .desktop-tabs { display: flex; }
+      .admin-header { height: 70px; padding: 0 48px; }
+    }
+
+    /* ── BOTTOM NAV ── */
+    .admin-bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+      height: calc(64px + var(--safe-bottom)); padding-bottom: var(--safe-bottom);
+      background: rgba(10,10,10,0.96); backdrop-filter: blur(18px);
+      border-top: 1px solid var(--line); display: flex;
+    }
+    .abn-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .04em; cursor: pointer; background: none; border: none;
+      position: relative; transition: color var(--transition);
+    }
+    .abn-item.active { color: var(--accent); }
+    .abn-item.active::before {
+      content: ''; position: absolute; top: 0; left: 20%; right: 20%;
+      height: 2px; background: var(--accent); border-radius: 0 0 4px 4px;
+    }
+    .abn-icon { font-size: 22px; line-height: 1; }
+    .abn-badge {
+      position: absolute; top: 7px; right: calc(50% - 24px);
+      min-width: 18px; height: 18px; background: #ef4444; color: #fff;
+      border-radius: 999px; font-size: 10px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center; padding: 0 4px;
+    }
+    @media (min-width: 768px) { .admin-bottom-nav { display: none; } }
+
+    /* ── CONTENT ── */
+    .admin-content { padding-top: calc(58px + var(--safe-top)); }
+    @media (min-width: 768px) { .admin-content { padding-top: 70px; } }
+
+    .tab-section { display: none; }
+    .tab-section.active { display: block; animation: fadeUp .25s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    .admin-page { padding: 20px; max-width: 900px; margin: 0 auto; }
+    @media (min-width: 768px) { .admin-page { padding: 32px 48px; } }
+
+    .page-title { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
+    .page-sub { color: var(--text2); font-size: 14px; margin-bottom: 22px; }
+
+    /* ── STATS ── */
+    .stats-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px;
+    }
+    @media (min-width: 600px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 16px 14px;
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .stat-card.highlight { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.04); }
+    .stat-label { color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+    .stat-value { font-size: 34px; font-weight: 900; line-height: 1; }
+    .stat-sub { color: var(--text2); font-size: 12px; }
+
+    /* ── APPOINTMENT ITEMS ── */
+    .appt-list { display: grid; gap: 10px; }
+    .appt-item {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 14px 16px;
+      display: flex; gap: 12px; align-items: flex-start;
+      cursor: pointer; transition: border-color var(--transition), background var(--transition);
+    }
+    .appt-item:hover { border-color: var(--line-strong); background: rgba(255,255,255,.02); }
+    .appt-time { flex-shrink: 0; width: 50px; text-align: center; }
+    .appt-time-val { font-size: 16px; font-weight: 900; line-height: 1; }
+    .appt-time-date { font-size: 10px; color: var(--muted); font-weight: 700; margin-top: 3px; }
+    .appt-body { flex: 1; min-width: 0; }
+    .appt-name { font-size: 15px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .appt-service { font-size: 12px; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .appt-ref { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .appt-right { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .appt-price { font-size: 15px; font-weight: 900; }
+
+    /* ── STATUS BADGES ── */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 800;
+    }
+    .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .sb-pending  { background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.25); }
+    .sb-pending::before  { background: #fbbf24; }
+    .sb-confirmed { background: rgba(59,130,246,.12); color: #60a5fa; border: 1px solid rgba(59,130,246,.25); }
+    .sb-confirmed::before { background: #60a5fa; }
+    .sb-done    { background: rgba(34,197,94,.12); color: #4ade80; border: 1px solid rgba(34,197,94,.25); }
+    .sb-done::before    { background: #4ade80; }
+    .sb-cancelled { background: rgba(239,68,68,.08); color: #f87171; border: 1px solid rgba(239,68,68,.2); }
+    .sb-cancelled::before { background: #f87171; }
+
+    /* ── FILTERS ── */
+    .filter-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-row .form-control { min-height: 42px; font-size: 14px; }
+    .filter-row input[type="search"] { flex: 1; min-width: 160px; }
+    .filter-row select { min-width: 150px; }
+    .filter-row input[type="date"] { min-width: 150px; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,.72);
+      backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .22s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: var(--surface); border: 1px solid var(--line-strong);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: 24px 20px calc(24px + var(--safe-bottom));
+      width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto;
+      transform: translateY(20px); transition: transform .22s;
+    }
+    .modal-overlay.open .modal-box { transform: translateY(0); }
+    @media (min-width: 600px) {
+      .modal-overlay { align-items: center; padding: 20px; }
+      .modal-box { border-radius: var(--radius-lg); padding: 28px; }
+    }
+    .modal-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .modal-title { font-size: 20px; font-weight: 800; }
+    .modal-ref { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .modal-close {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--surface2); border: 1px solid var(--line); color: var(--text2);
+      font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+    }
+    .modal-details { display: grid; gap: 0; margin-bottom: 20px; }
+    .modal-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line);
+    }
+    .modal-row:last-child { border-bottom: none; }
+    .modal-row-label { color: var(--text2); font-size: 13px; flex-shrink: 0; }
+    .modal-row-value { font-weight: 700; text-align: right; }
+    .modal-actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 16px; border-top: 1px solid var(--line); }
+
+    /* ── ACTION BUTTONS ── */
+    .btn-success { background: rgba(34,197,94,.15); color: #4ade80; border: 1px solid rgba(34,197,94,.3); }
+    .btn-blue    { background: rgba(59,130,246,.15); color: #60a5fa; border: 1px solid rgba(59,130,246,.3); }
+    .btn-danger  { background: rgba(239,68,68,.12);  color: #f87171; border: 1px solid rgba(239,68,68,.25); }
+    .btn-warning { background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.25); }
+    .btn-sm { min-height: 40px; padding: 8px 16px; font-size: 13px; }
+    .btn-xs { min-height: 32px; padding: 5px 12px; font-size: 12px; border-radius: 10px; }
+
+    /* ── CONFIG ── */
+    .config-block { margin-bottom: 28px; }
+    .config-block h3 { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+    .config-block .config-desc { color: var(--text2); font-size: 13px; margin-bottom: 14px; line-height: 1.6; }
+    .divider { height: 1px; background: var(--line); margin: 24px 0; }
+
+    .add-blocked-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .add-blocked-row .form-control { min-height: 42px; font-size: 14px; flex: 1; min-width: 130px; }
+    .blocked-list { display: grid; gap: 8px; margin-top: 12px; }
+    .blocked-item {
+      background: var(--surface2); border: 1px solid var(--line);
+      border-radius: var(--radius-sm); padding: 10px 14px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .blocked-item-time { font-size: 15px; font-weight: 800; }
+    .blocked-item-date { color: var(--text2); font-size: 12px; margin-top: 2px; }
+
+    .today-empty {
+      background: var(--surface2); border: 1px dashed var(--line-strong);
+      border-radius: var(--radius); padding: 24px; text-align: center; color: var(--text2); font-size: 14px;
+    }
+    .section-heading { font-size: 17px; font-weight: 900; margin-bottom: 12px; }
+  </style>
+</head>
+<body class="admin-body">
+  <div class="bg-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div></div>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ══════════════════════════════
+       LOGIN
+  ══════════════════════════════ -->
+  <div id="loginScreen">
+    <div class="login-screen">
+      <div>
+        <div class="login-logo">Barbeiro Barril</div>
+        <div class="login-subtitle">Área do barbeiro</div>
+      </div>
+      <div class="login-card card">
+        <h2>Acesso restrito</h2>
+        <p class="login-hint">Digite o PIN para gerenciar os agendamentos.</p>
+        <div class="form-stack">
+          <div class="form-group">
+            <label class="form-label">PIN de acesso</label>
+            <input id="pinInput" class="form-control pin-input" type="password"
+              inputmode="numeric" maxlength="8" placeholder="••••"
+              autocomplete="current-password" />
+          </div>
+          <button class="btn btn-primary btn-full" onclick="tryLogin()">Entrar</button>
+        </div>
+        <p class="login-default">PIN padrão: <strong>1234</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       ADMIN APP
+  ══════════════════════════════ -->
+  <div id="adminApp" style="display:none">
+
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="admin-header-left">
+        <div class="admin-title">Painel Admin</div>
+        <div class="admin-sub">Barbeiro Barril · Gilson Borges</div>
+      </div>
+      <div class="admin-header-right">
+        <div class="desktop-tabs" id="desktopTabs">
+          <button class="dt-btn active" id="dtab-painel"   onclick="switchTab('painel')">Painel</button>
+          <button class="dt-btn"        id="dtab-agenda"   onclick="switchTab('agenda')">Agendamentos</button>
+          <button class="dt-btn"        id="dtab-config"   onclick="switchTab('config')">Configurações</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="logout()">Sair</button>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="admin-content">
+
+      <!-- ── TAB: PAINEL ── -->
+      <div class="tab-section active" id="tab-painel">
+        <div class="admin-page">
+          <div class="page-title">Visão geral</div>
+          <div class="page-sub" id="todayLabel">—</div>
+          <div class="stats-grid" id="statsGrid"></div>
+          <div class="section-heading">Agenda de hoje</div>
+          <div class="appt-list" id="todayList"></div>
+        </div>
+      </div>
+
+      <!-- ── TAB: AGENDAMENTOS ── -->
+      <div class="tab-section" id="tab-agenda">
+        <div class="admin-page">
+          <div class="page-title">Agendamentos</div>
+          <div class="page-sub">Gerencie todos os horários marcados</div>
+          <div class="filter-row">
+            <input type="search" id="filterSearch" class="form-control"
+              placeholder="Buscar nome, telefone ou referência..."
+              oninput="renderAgenda()" />
+            <select id="filterStatus" class="form-control" onchange="renderAgenda()">
+              <option value="all">Todos os status</option>
+              <option value="pending">Pendentes</option>
+              <option value="confirmed">Confirmados</option>
+              <option value="done">Concluídos</option>
+              <option value="cancelled">Cancelados</option>
+            </select>
+            <input type="date" id="filterDate" class="form-control" onchange="renderAgenda()" />
+          </div>
+          <div class="appt-list" id="agendaList"></div>
+        </div>
+      </div>
+
+      <!-- ── TAB: CONFIGURAÇÕES ── -->
+      <div class="tab-section" id="tab-config">
+        <div class="admin-page">
+          <div class="page-title">Configurações</div>
+          <div class="page-sub">Personalize o painel e controle os horários</div>
+
+          <!-- PIN -->
+          <div class="config-block">
+            <h3>Alterar PIN de acesso</h3>
+            <p class="config-desc">Mude o código de acesso ao painel administrativo.</p>
+            <div class="form-stack" style="max-width:320px">
+              <div class="form-group">
+                <label class="form-label">PIN atual</label>
+                <input id="pinCurrent" class="form-control pin-input" type="password" inputmode="numeric" maxlength="8" placeholder="••••" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Novo PIN</label>
+                <input id="pinNew" class="form-control pin-input" type="password" inputmode="numeric" maxlength="8" placeholder="••••" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Confirmar novo PIN</label>
+                <input id="pinConfirm" class="form-control pin-input" type="password" inputmode="numeric" maxlength="8" placeholder="••••" />
+              </div>
+              <button class="btn btn-primary" onclick="changePin()">Salvar PIN</button>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Blocked Slots -->
+          <div class="config-block">
+            <h3>Horários bloqueados</h3>
+            <p class="config-desc">Bloqueie horários específicos por data. Eles não aparecerão disponíveis no agendamento online.</p>
+            <div class="add-blocked-row">
+              <input type="date" id="blockDate" class="form-control" />
+              <select id="blockTime" class="form-control">
+                <option value="">Horário...</option>
+                <option>08:00</option><option>08:30</option><option>09:00</option><option>09:30</option>
+                <option>10:00</option><option>10:30</option><option>11:00</option><option>11:30</option>
+                <option>13:00</option><option>13:30</option><option>14:00</option><option>14:30</option>
+                <option>15:00</option><option>15:30</option><option>16:00</option><option>16:30</option>
+                <option>17:00</option>
+              </select>
+              <button class="btn btn-ghost" style="min-height:42px" onclick="addBlockedSlot()">Bloquear</button>
+            </div>
+            <div class="blocked-list" id="blockedList"></div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Export -->
+          <div class="config-block">
+            <h3>Exportar agendamentos</h3>
+            <p class="config-desc">Baixe todos os agendamentos em JSON para backup ou análise.</p>
+            <button class="btn btn-ghost" onclick="exportData()">⬇ Baixar JSON</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Danger -->
+          <div class="config-block">
+            <h3>Limpar cancelados</h3>
+            <p class="config-desc">Remove permanentemente todos os agendamentos com status "Cancelado" do histórico.</p>
+            <button class="btn btn-danger" onclick="clearCancelled()">Apagar cancelados</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom nav (mobile) -->
+    <nav class="admin-bottom-nav">
+      <button class="abn-item active" id="btab-painel" onclick="switchTab('painel')">
+        <span class="abn-icon">📊</span><span>Painel</span>
+      </button>
+      <button class="abn-item" id="btab-agenda" onclick="switchTab('agenda')">
+        <span class="abn-icon">📅</span><span>Agenda</span>
+        <span class="abn-badge" id="pendingBadge" style="display:none">0</span>
+      </button>
+      <button class="abn-item" id="btab-config" onclick="switchTab('config')">
+        <span class="abn-icon">⚙️</span><span>Config</span>
+      </button>
+    </nav>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="handleModalClick(event)">
+      <div class="modal-box">
+        <div class="modal-top">
+          <div>
+            <div class="modal-title" id="modalTitle">—</div>
+            <div class="modal-ref" id="modalRef">—</div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-details" id="modalDetails"></div>
+        <div class="modal-actions" id="modalActions"></div>
+      </div>
+    </div>
+
+  </div><!-- /adminApp -->
+
+  <script src="../js/data.js"></script>
+  <script>
+    /* ═══════════════════════════════════════
+       ADMIN SCRIPT
+    ═══════════════════════════════════════ */
+
+    const KEYS = {
+      appointments: 'bb_appointments',
+      pin: 'bb_admin_pin',
+      blocked: 'bb_blocked_slots',
+    };
+
+    let currentTab = 'painel';
+    let currentModalId = null;
+
+    /* ── AUTH ────────────────────────────── */
+
+    function getPin() {
+      return localStorage.getItem(KEYS.pin) || '1234';
+    }
+
+    function tryLogin() {
+      const val = document.getElementById('pinInput').value;
+      if (val === getPin()) {
+        sessionStorage.setItem('bb_admin_auth', '1');
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminApp').style.display = 'block';
+        initAdmin();
+      } else {
+        AP.toast('PIN incorreto. Tente novamente.', 'error');
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinInput').focus();
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem('bb_admin_auth');
+      document.getElementById('loginScreen').style.display = 'block';
+      document.getElementById('adminApp').style.display = 'none';
+      document.getElementById('pinInput').value = '';
+    }
+
+    /* ── DATA ────────────────────────────── */
+
+    function getAppointments() {
+      try { return JSON.parse(localStorage.getItem(KEYS.appointments) || '[]'); }
+      catch { return []; }
+    }
+
+    function saveAppointments(list) {
+      localStorage.setItem(KEYS.appointments, JSON.stringify(list));
+    }
+
+    function getBlockedSlots() {
+      try { return JSON.parse(localStorage.getItem(KEYS.blocked) || '{}'); }
+      catch { return {}; }
+    }
+
+    function saveBlockedSlots(obj) {
+      localStorage.setItem(KEYS.blocked, JSON.stringify(obj));
+    }
+
+    /* ── TABS ────────────────────────────── */
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+
+      ['painel', 'agenda', 'config'].forEach(t => {
+        document.getElementById('btab-' + t)?.classList.toggle('active', t === tab);
+        document.getElementById('dtab-' + t)?.classList.toggle('active', t === tab);
+      });
+
+      if (tab === 'painel') renderPainel();
+      else if (tab === 'agenda') renderAgenda();
+      else if (tab === 'config') renderConfig();
+    }
+
+    /* ── DASHBOARD ───────────────────────── */
+
+    function renderPainel() {
+      const apts = getAppointments();
+      const today = new Date();
+      const todayStr = AP.toDateStr(today);
+
+      document.getElementById('todayLabel').textContent = 'Hoje, ' + AP.formatDate(today);
+
+      const todayApts  = apts.filter(a => a.date === todayStr && a.status !== 'cancelled');
+      const weekApts   = apts.filter(a => {
+        const d = new Date(a.date + 'T12:00:00');
+        const diff = (d - today) / (1000 * 60 * 60 * 24);
+        return diff >= 0 && diff < 7 && a.status !== 'cancelled';
+      });
+      const pending    = apts.filter(a => a.status === 'pending');
+      const confirmed  = apts.filter(a => a.status === 'confirmed');
+
+      document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-card highlight">
+          <div class="stat-label">Hoje</div>
+          <div class="stat-value">${todayApts.length}</div>
+          <div class="stat-sub">agendamento${todayApts.length !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Próx. 7 dias</div>
+          <div class="stat-value">${weekApts.length}</div>
+          <div class="stat-sub">agendamentos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pendentes</div>
+          <div class="stat-value" style="color:#fbbf24">${pending.length}</div>
+          <div class="stat-sub">aguardando confirmação</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Confirmados</div>
+          <div class="stat-value" style="color:#60a5fa">${confirmed.length}</div>
+          <div class="stat-sub">horários confirmados</div>
+        </div>
+      `;
+
+      const todayFull = apts
+        .filter(a => a.date === todayStr)
+        .sort((a, b) => a.time.localeCompare(b.time));
+
+      if (todayFull.length === 0) {
+        document.getElementById('todayList').innerHTML =
+          '<div class="today-empty">Nenhum agendamento para hoje.</div>';
+      } else {
+        document.getElementById('todayList').innerHTML = todayFull.map(a => apptItemHTML(a, false)).join('');
+      }
+
+      updatePendingBadge(pending.length);
+    }
+
+    /* ── AGENDA ──────────────────────────── */
+
+    function renderAgenda() {
+      const all = getAppointments();
+      const search = (document.getElementById('filterSearch')?.value || '').toLowerCase().trim();
+      const status = document.getElementById('filterStatus')?.value || 'all';
+      const date   = document.getElementById('filterDate')?.value || '';
+
+      let list = all.filter(a => {
+        if (status !== 'all' && a.status !== status) return false;
+        if (date && a.date !== date) return false;
+        if (search &&
+          !a.name.toLowerCase().includes(search) &&
+          !a.id.toLowerCase().includes(search) &&
+          !a.phone.replace(/\D/g,'').includes(search.replace(/\D/g,''))
+        ) return false;
+        return true;
+      });
+
+      list.sort((a, b) => {
+        const dateComp = b.date.localeCompare(a.date);
+        return dateComp !== 0 ? dateComp : b.time.localeCompare(a.time);
+      });
+
+      if (list.length === 0) {
+        document.getElementById('agendaList').innerHTML =
+          '<div class="empty-state">Nenhum agendamento encontrado.</div>';
+        return;
+      }
+
+      document.getElementById('agendaList').innerHTML = list.map(a => apptItemHTML(a, true)).join('');
+    }
+
+    function apptItemHTML(a, showDate) {
+      const [cls, label] = statusInfo(a.status);
+      return `
+        <div class="appt-item" onclick="openModal('${escAttr(a.id)}')">
+          <div class="appt-time">
+            <div class="appt-time-val">${escHtml(a.time)}</div>
+            ${showDate ? `<div class="appt-time-date">${formatShortDate(a.date)}</div>` : ''}
+          </div>
+          <div class="appt-body">
+            <div class="appt-name">${escHtml(a.name)}</div>
+            <div class="appt-service">${escHtml(a.serviceName)}</div>
+            <div class="appt-ref">${escHtml(a.id)}</div>
+          </div>
+          <div class="appt-right">
+            <div class="appt-price">${AP.formatPrice(a.servicePrice)}</div>
+            <div class="status-badge ${cls}">${label}</div>
+          </div>
+        </div>`;
+    }
+
+    /* ── MODAL ───────────────────────────── */
+
+    function openModal(id) {
+      const a = getAppointments().find(x => x.id === id);
+      if (!a) return;
+      currentModalId = id;
+
+      const [cls, label] = statusInfo(a.status);
+      const waNum = '55' + a.phone.replace(/\D/g,'');
+
+      document.getElementById('modalTitle').textContent = a.name;
+      document.getElementById('modalRef').textContent = a.id;
+
+      document.getElementById('modalDetails').innerHTML = `
+        <div class="modal-row">
+          <span class="modal-row-label">Status</span>
+          <span class="modal-row-value"><span class="status-badge ${cls}">${label}</span></span>
+        </div>
+        <div class="modal-row">
+          <span class="modal-row-label">Serviço</span>
+          <span class="modal-row-value">${escHtml(a.serviceName)}</span>
+        </div>
+        <div class="modal-row">
+          <span class="modal-row-label">Data</span>
+          <span class="modal-row-value">${AP.formatDate(new Date(a.date + 'T12:00:00'))}</span>
+        </div>
+        <div class="modal-row">
+          <span class="modal-row-label">Horário</span>
+          <span class="modal-row-value">${escHtml(a.time)}</span>
+        </div>
+        <div class="modal-row">
+          <span class="modal-row-label">Duração</span>
+          <span class="modal-row-value">${escHtml(a.serviceDur)}</span>
+        </div>
+        <div class="modal-row">
+          <span class="modal-row-label">Valor</span>
+          <span class="modal-row-value">${AP.formatPrice(a.servicePrice)}</span>
+        </div>
+        <div class="modal-row">
+          <span class="modal-row-label">WhatsApp</span>
+          <span class="modal-row-value">
+            <a href="https://wa.me/${waNum}" target="_blank" rel="noopener"
+               style="color:#4ade80; text-decoration:none">${escHtml(a.phone)}</a>
+          </span>
+        </div>
+        ${a.email ? `<div class="modal-row"><span class="modal-row-label">E-mail</span><span class="modal-row-value">${escHtml(a.email)}</span></div>` : ''}
+        ${a.notes ? `<div class="modal-row"><span class="modal-row-label">Observações</span><span class="modal-row-value">${escHtml(a.notes)}</span></div>` : ''}
+        <div class="modal-row">
+          <span class="modal-row-label">Registrado em</span>
+          <span class="modal-row-value">${formatDateTime(a.createdAt)}</span>
+        </div>
+      `;
+
+      let actions = '';
+      if (a.status === 'pending') {
+        actions += `<button class="btn btn-success btn-sm" onclick="setStatus('${escAttr(id)}','confirmed')">✔ Confirmar</button>`;
+        actions += `<button class="btn btn-danger  btn-sm" onclick="setStatus('${escAttr(id)}','cancelled')">✕ Cancelar</button>`;
+      }
+      if (a.status === 'confirmed') {
+        actions += `<button class="btn btn-blue   btn-sm" onclick="setStatus('${escAttr(id)}','done')">✔ Concluir</button>`;
+        actions += `<button class="btn btn-danger  btn-sm" onclick="setStatus('${escAttr(id)}','cancelled')">✕ Cancelar</button>`;
+      }
+      if (a.status === 'done' || a.status === 'cancelled') {
+        actions += `<button class="btn btn-warning btn-sm" onclick="setStatus('${escAttr(id)}','pending')">↩ Reabrir</button>`;
+      }
+      actions += `<button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="deleteAppt('${escAttr(id)}')">Excluir</button>`;
+
+      document.getElementById('modalActions').innerHTML = actions;
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      currentModalId = null;
+    }
+
+    function handleModalClick(e) {
+      if (e.target === document.getElementById('modalOverlay')) closeModal();
+    }
+
+    /* ── STATUS ──────────────────────────── */
+
+    function setStatus(id, status) {
+      const apts = getAppointments();
+      const idx = apts.findIndex(a => a.id === id);
+      if (idx === -1) return;
+      apts[idx].status = status;
+      saveAppointments(apts);
+      closeModal();
+      const labels = { confirmed: 'Confirmado', done: 'Concluído', cancelled: 'Cancelado', pending: 'Reaberto' };
+      AP.toast(`Agendamento ${labels[status] || status}.`, 'success');
+      refresh();
+      updatePendingBadge(apts.filter(a => a.status === 'pending').length);
+    }
+
+    function deleteAppt(id) {
+      if (!confirm('Excluir este agendamento permanentemente? Esta ação não pode ser desfeita.')) return;
+      const apts = getAppointments().filter(a => a.id !== id);
+      saveAppointments(apts);
+      closeModal();
+      AP.toast('Agendamento excluído.', 'info');
+      refresh();
+      updatePendingBadge(apts.filter(a => a.status === 'pending').length);
+    }
+
+    function refresh() {
+      if (currentTab === 'painel') renderPainel();
+      else if (currentTab === 'agenda') renderAgenda();
+    }
+
+    /* ── CONFIG ──────────────────────────── */
+
+    function renderConfig() {
+      renderBlockedList();
+    }
+
+    function changePin() {
+      const cur = document.getElementById('pinCurrent').value;
+      const nw  = document.getElementById('pinNew').value;
+      const cnf = document.getElementById('pinConfirm').value;
+      if (cur !== getPin())     { AP.toast('PIN atual incorreto.', 'error');  return; }
+      if (nw.length < 4)        { AP.toast('O novo PIN precisa ter ao menos 4 dígitos.', 'error'); return; }
+      if (nw !== cnf)           { AP.toast('Os PINs não coincidem.', 'error'); return; }
+      localStorage.setItem(KEYS.pin, nw);
+      ['pinCurrent','pinNew','pinConfirm'].forEach(id => { document.getElementById(id).value = ''; });
+      AP.toast('PIN alterado com sucesso!', 'success');
+    }
+
+    function addBlockedSlot() {
+      const date = document.getElementById('blockDate').value;
+      const time = document.getElementById('blockTime').value;
+      if (!date || !time) { AP.toast('Selecione data e horário.', 'error'); return; }
+      const blocked = getBlockedSlots();
+      if (!blocked[date]) blocked[date] = [];
+      if (blocked[date].includes(time)) { AP.toast('Este horário já está bloqueado nessa data.', 'warning'); return; }
+      blocked[date].push(time);
+      blocked[date].sort();
+      saveBlockedSlots(blocked);
+      document.getElementById('blockDate').value = '';
+      document.getElementById('blockTime').value = '';
+      AP.toast('Horário bloqueado!', 'success');
+      renderBlockedList();
+    }
+
+    function removeBlockedSlot(date, time) {
+      const blocked = getBlockedSlots();
+      if (blocked[date]) {
+        blocked[date] = blocked[date].filter(t => t !== time);
+        if (blocked[date].length === 0) delete blocked[date];
+      }
+      saveBlockedSlots(blocked);
+      renderBlockedList();
+    }
+
+    function renderBlockedList() {
+      const blocked = getBlockedSlots();
+      const entries = [];
+      Object.keys(blocked).sort().forEach(date => {
+        blocked[date].forEach(time => entries.push({ date, time }));
+      });
+      if (entries.length === 0) {
+        document.getElementById('blockedList').innerHTML =
+          '<div class="empty-state" style="margin-top:10px">Nenhum horário bloqueado.</div>';
+        return;
+      }
+      document.getElementById('blockedList').innerHTML = entries.map(e => `
+        <div class="blocked-item">
+          <div>
+            <div class="blocked-item-time">${e.time}</div>
+            <div class="blocked-item-date">${AP.formatDate(new Date(e.date + 'T12:00:00'))}</div>
+          </div>
+          <button class="btn btn-danger btn-xs"
+            onclick="removeBlockedSlot('${escAttr(e.date)}','${escAttr(e.time)}')">Remover</button>
+        </div>`).join('');
+    }
+
+    function exportData() {
+      const apts = getAppointments();
+      const blob = new Blob([JSON.stringify(apts, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `barbeiro-barril-agendamentos-${AP.toDateStr(new Date())}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function clearCancelled() {
+      if (!confirm('Apagar todos os agendamentos cancelados? Esta ação não pode ser desfeita.')) return;
+      const apts = getAppointments().filter(a => a.status !== 'cancelled');
+      saveAppointments(apts);
+      AP.toast('Agendamentos cancelados removidos.', 'success');
+    }
+
+    /* ── UTILS ───────────────────────────── */
+
+    function statusInfo(status) {
+      const map = {
+        pending:   ['sb-pending',   'Pendente'],
+        confirmed: ['sb-confirmed', 'Confirmado'],
+        done:      ['sb-done',      'Concluído'],
+        cancelled: ['sb-cancelled', 'Cancelado'],
+      };
+      return map[status] || ['sb-pending', 'Pendente'];
+    }
+
+    function formatShortDate(dateStr) {
+      const [, m, d] = dateStr.split('-');
+      return `${d}/${m}`;
+    }
+
+    function formatDateTime(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function pad(n) { return String(n).padStart(2,'0'); }
+
+    function escHtml(str) {
+      return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function escAttr(str) {
+      return String(str ?? '').replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+    }
+
+    function updatePendingBadge(count) {
+      const badge = document.getElementById('pendingBadge');
+      badge.textContent = count;
+      badge.style.display = count > 0 ? 'flex' : 'none';
+    }
+
+    /* ── INIT ────────────────────────────── */
+
+    function initAdmin() {
+      renderPainel();
+    }
+
+    window.addEventListener('load', () => {
+      if (sessionStorage.getItem('bb_admin_auth') === '1') {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminApp').style.display = 'block';
+        initAdmin();
+      }
+    });
+
+    document.getElementById('pinInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') tryLogin();
+    });
+  </script>
+</body>
+</html>

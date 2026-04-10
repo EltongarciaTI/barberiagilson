@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#050505" />
+  <title>Barbeiro Barril — Agende seu horário</title>
+  <meta name="description" content="Agendamento online da barbearia Barbeiro Barril com Gilson Borges em Algodões, Quijingue - BA." />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── HERO COMPACTO ── */
+    .hero {
+      padding: 40px 20px 32px;
+      max-width: 760px;
+      margin: 0 auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 10vw, 64px);
+      line-height: 1.06;
+      letter-spacing: -.02em;
+    }
+    .hero-sub {
+      color: var(--text2);
+      font-size: 16px;
+      line-height: 1.65;
+      max-width: 480px;
+    }
+    .hero-cta {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+      max-width: 360px;
+      margin-top: 4px;
+    }
+
+    /* ── SERVIÇOS ── */
+    .services-section {
+      padding: 8px 20px 36px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .services-header {
+      margin-bottom: 20px;
+    }
+    .services-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(26px, 6vw, 38px);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .services-header p {
+      color: var(--text2);
+      font-size: 14px;
+    }
+
+    .svc-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .svc-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: border-color var(--transition), background var(--transition);
+      text-decoration: none;
+      color: inherit;
+    }
+    .svc-card:hover {
+      border-color: var(--line-strong);
+      background: rgba(255,255,255,.025);
+    }
+    .svc-card:active { transform: scale(.99); }
+    .svc-photo {
+      width: 78px; height: 78px;
+      border-radius: 16px;
+      background: linear-gradient(160deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px dashed var(--line-strong);
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); font-size: 10px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .08em; text-align: center;
+      padding: 6px;
+    }
+    .svc-photo img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .svc-body { flex: 1; min-width: 0; }
+    .svc-name { font-size: 15px; font-weight: 800; line-height: 1.3; }
+    .svc-dur  { color: var(--muted); font-size: 12px; font-weight: 700; margin-top: 2px; }
+    .svc-note { color: var(--accent2); font-size: 11px; margin-top: 3px; }
+    .svc-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .svc-price { font-size: 17px; font-weight: 900; }
+    .svc-btn {
+      min-height: 34px;
+      padding: 6px 14px;
+      font-size: 12px;
+      border-radius: 10px;
+      background: #fff;
+      color: #000;
+      font-weight: 800;
+      border: none;
+      white-space: nowrap;
+    }
+
+    /* Category filter chips */
+    .cat-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .cat-chip {
+      padding: 7px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--surface2);
+      border: 1px solid var(--line);
+      color: var(--text2);
+      cursor: pointer;
+      transition: color var(--transition), border-color var(--transition), background var(--transition);
+    }
+    .cat-chip.active {
+      background: #fff;
+      color: #000;
+      border-color: #fff;
+    }
+
+    /* ── COMO FUNCIONA ── */
+    .steps-section {
+      padding: 0 20px 36px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .steps-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(24px, 5vw, 34px);
+      margin-bottom: 18px;
+    }
+    .steps-grid { display: grid; gap: 10px; }
+    .step-card {
+      padding: 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .step-num {
+      width: 36px; height: 36px; border-radius: 12px;
+      background: #fff; color: #000;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 15px; flex-shrink: 0;
+    }
+    .step-card h3 { font-size: 16px; font-weight: 800; margin-bottom: 5px; }
+    .step-card p  { color: var(--text2); font-size: 14px; line-height: 1.6; }
+
+    /* ── CTA BANNER ── */
+    .cta-section {
+      padding: 0 20px 36px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .cta-card {
+      padding: 36px 24px;
+      text-align: center;
+    }
+    .cta-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 6vw, 42px);
+      margin-bottom: 10px;
+    }
+    .cta-card p {
+      color: var(--text2);
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto 22px;
+    }
+    .cta-card .btn { max-width: 300px; margin: 0 auto; }
+
+    /* ── SOBRE ── */
+    .about-section {
+      padding: 0 20px 36px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .about-section .section-label { margin-bottom: 14px; }
+    .about-card {
+      padding: 24px;
+      display: grid;
+      gap: 20px;
+    }
+    .about-row {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .about-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .about-row-title { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
+    .about-row-sub   { color: var(--text2); font-size: 13px; line-height: 1.6; }
+    .about-map-link  {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 6px;
+      font-size: 13px; font-weight: 700; color: var(--text2);
+      text-decoration: none; border-bottom: 1px solid var(--line-strong);
+      padding-bottom: 1px;
+    }
+    .about-map-link:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ── RESPONSIVE ── */
+    @media (min-width: 768px) {
+      .hero { padding: 56px 48px 44px; }
+      .hero-cta { flex-direction: row; max-width: none; justify-content: center; }
+      .services-section { padding: 8px 48px 44px; }
+      .svc-grid { grid-template-columns: 1fr 1fr; }
+      .steps-section { padding: 0 48px 44px; }
+      .steps-grid { grid-template-columns: repeat(3, 1fr); }
+      .cta-section { padding: 0 48px 44px; }
+      .about-section { padding: 0 48px 44px; }
+      .about-card { grid-template-columns: 1fr 1fr 1fr; }
+    }
+    @media (min-width: 1024px) {
+      .svc-grid { grid-template-columns: 1fr 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div></div>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <header class="topbar">
+    <a href="index.html" class="topbar-logo">Barbeiro Barril</a>
+    <nav class="topbar-nav-links">
+      <a href="index.html" class="active">Início</a>
+      <a href="pages/servicos.html">Serviços</a>
+      <a href="pages/agendar.html">Agendar</a>
+      <a href="pages/contato.html">Contato</a>
+    </nav>
+    <a href="pages/agendar.html" class="topbar-action">Agendar</a>
+  </header>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="bn-item active"><span class="bn-icon">🏠</span><span>Início</span></a>
+    <a href="pages/servicos.html" class="bn-item"><span class="bn-icon">✂️</span><span>Serviços</span></a>
+    <a href="pages/agendar.html" class="bn-item center-btn"><div class="bn-icon-wrap">📅</div><span>Agendar</span></a>
+    <a href="pages/contato.html" class="bn-item"><span class="bn-icon">📍</span><span>Contato</span></a>
+  </nav>
+
+  <div class="page-wrap">
+
+    <!-- ══ HERO ══ -->
+    <section class="hero">
+      <div class="badge"><div class="badge-dot"></div>Terça a domingo · 08h às 17h</div>
+      <h1 class="gradient-text">Corte e barba do jeito certo.</h1>
+      <p class="hero-sub">Escolha o serviço e marque seu horário em menos de 1 minuto, direto pelo celular.</p>
+      <div class="hero-cta">
+        <a href="pages/agendar.html" class="btn btn-primary">Agendar agora</a>
+        <a href="#servicos" class="btn btn-ghost">Ver serviços</a>
+      </div>
+    </section>
+
+    <!-- ══ SERVIÇOS ══ -->
+    <section class="services-section" id="servicos">
+      <div class="services-header">
+        <div class="section-label">O que oferecemos</div>
+        <h2>Escolha o seu serviço</h2>
+        <p>Clique em qualquer serviço para ir direto ao agendamento.</p>
+      </div>
+
+      <div class="cat-chips" id="catChips"></div>
+      <div class="svc-grid" id="svcGrid"></div>
+    </section>
+
+    <!-- ══ COMO FUNCIONA ══ -->
+    <section class="steps-section">
+      <div class="section-label">Simples assim</div>
+      <h2>Como funciona o agendamento</h2>
+      <div class="steps-grid">
+        <div class="step-card card">
+          <div class="step-num">1</div>
+          <div>
+            <h3>Escolha o serviço</h3>
+            <p>Selecione o corte, barba ou combo que você quer na lista acima.</p>
+          </div>
+        </div>
+        <div class="step-card card">
+          <div class="step-num">2</div>
+          <div>
+            <h3>Escolha o dia e horário</h3>
+            <p>O calendário mostra só os dias disponíveis. Toque no horário que preferir.</p>
+          </div>
+        </div>
+        <div class="step-card card">
+          <div class="step-num">3</div>
+          <div>
+            <h3>Confirme seus dados</h3>
+            <p>Informe seu nome e WhatsApp para finalizar. Pronto — agendamento registrado.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ CTA ══ -->
+    <section class="cta-section">
+      <div class="cta-card card">
+        <h2 class="gradient-text">Pronto para marcar?</h2>
+        <p>Sem espera, sem ligação. Escolha o horário que encaixa na sua rotina e agende agora.</p>
+        <a href="pages/agendar.html" class="btn btn-primary btn-full">Fazer agendamento</a>
+      </div>
+    </section>
+
+    <!-- ══ SOBRE ══ -->
+    <section class="about-section">
+      <div class="section-label">Sobre</div>
+      <div class="about-card card">
+        <div class="about-row">
+          <span class="about-icon">💈</span>
+          <div>
+            <div class="about-row-title">Barbeiro Barril</div>
+            <div class="about-row-sub">Barbearia com Gilson Borges. Atendimento focado em corte, barba e acabamento com qualidade e organização.</div>
+          </div>
+        </div>
+        <div class="about-row">
+          <span class="about-icon">🕒</span>
+          <div>
+            <div class="about-row-title">Funcionamento</div>
+            <div class="about-row-sub">Terça a domingo, das 08h às 17h.<br>Segunda-feira: fechado.</div>
+          </div>
+        </div>
+        <div class="about-row">
+          <span class="about-icon">📍</span>
+          <div>
+            <div class="about-row-title">Localização</div>
+            <div class="about-row-sub">Algodões, Quijingue — BA</div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Algod%C3%B5es%2C+Quijingue+-+BA" target="_blank" rel="noopener" class="about-map-link">Ver no mapa →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-logo">Barbeiro Barril</div>
+      <div class="footer-links-row">
+        <a href="index.html">Início</a>
+        <a href="pages/servicos.html">Serviços</a>
+        <a href="pages/agendar.html">Agendar</a>
+        <a href="pages/contato.html">Contato</a>
+      </div>
+      <div class="footer-copy">© 2026 Barbeiro Barril · Atendimento com Gilson Borges</div>
+    </footer>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    let activeCategory = 'todos';
+
+    function renderChips() {
+      document.getElementById('catChips').innerHTML = AP.categories.map(c => `
+        <button class="cat-chip${c.id === activeCategory ? ' active' : ''}" onclick="filterCat('${c.id}')">
+          ${c.label}
+        </button>
+      `).join('');
+    }
+
+    function filterCat(id) {
+      activeCategory = id;
+      renderChips();
+      renderServices();
+    }
+
+    function renderServices() {
+      const list = activeCategory === 'todos'
+        ? AP.services
+        : AP.services.filter(s => s.category === activeCategory);
+
+      document.getElementById('svcGrid').innerHTML = list.map(s => `
+        <a class="svc-card" href="pages/agendar.html?service=${s.id}">
+          <div class="svc-photo">${s.photo ? `<img src="${s.photo}" alt="${s.name}">` : 'Foto do serviço'}</div>
+          <div class="svc-body">
+            <div class="svc-name">${s.name}</div>
+            <div class="svc-dur">${s.dur}</div>
+            ${s.note ? `<div class="svc-note">${s.note}</div>` : ''}
+          </div>
+          <div class="svc-right">
+            <div class="svc-price">${AP.formatPrice(s.price)}</div>
+            <span class="svc-btn">Agendar</span>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    renderChips();
+    renderServices();
+  </script>
+</body>
+</html>

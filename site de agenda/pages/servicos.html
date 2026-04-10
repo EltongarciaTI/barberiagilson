@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#050505" />
+  <title>Serviços — Barbeiro Barril</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .hero { padding: 30px 20px 10px; max-width: 1100px; margin: 0 auto; }
+    .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 8vw, 52px); margin: 10px 0 10px; }
+    .hero p { color: var(--text2); line-height: 1.7; max-width: 700px; }
+    .chips { display: flex; gap: 10px; overflow-x: auto; padding: 18px 20px 8px; max-width: 1100px; margin: 0 auto; }
+    .chips::-webkit-scrollbar { display:none; }
+    .chip {
+      flex-shrink: 0; padding: 10px 16px; border-radius: 999px; background: var(--surface2); color: var(--text2);
+      border: 1px solid var(--line); font-size: 13px; font-weight: 800; letter-spacing: .02em; cursor: pointer;
+    }
+    .chip.active { background: #fff; color: #000; border-color: #fff; }
+    .grid { max-width: 1100px; margin: 0 auto; padding: 10px 20px 32px; display: grid; gap: 14px; }
+    .item { padding: 20px; display: grid; gap: 14px; }
+    .item-media {
+      width: 100%; aspect-ratio: 16 / 10; border-radius: 18px; border: 1px dashed var(--line-strong);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      display: flex; align-items: center; justify-content: center; color: var(--muted);
+      font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; overflow: hidden;
+    }
+    .item-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .item-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .item-title { font-size: 18px; font-weight: 800; line-height: 1.35; }
+    .item-price { font-size: 20px; font-weight: 900; white-space: nowrap; }
+    .item-meta { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 800; }
+    .item-desc { color: var(--text2); line-height: 1.7; font-size: 14px; }
+    .item-note { color: var(--accent2); font-size: 13px; font-weight: 700; }
+    .faq-wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px 34px; }
+    .faq-grid { display: grid; gap: 12px; }
+    .faq { padding: 18px 20px; }
+    .faq h3 { font-size: 15px; margin-bottom: 6px; }
+    .faq p { color: var(--text2); line-height: 1.7; font-size: 14px; }
+    @media (min-width: 768px) {
+      .hero { padding: 50px 48px 14px; }
+      .chips { padding: 18px 48px 10px; }
+      .grid { padding: 14px 48px 42px; grid-template-columns: repeat(2, 1fr); }
+      .faq-wrap { padding: 0 48px 42px; }
+      .faq-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div></div>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <header class="topbar">
+    <a href="../index.html" class="topbar-logo">Barbeiro Barril</a>
+    <nav class="topbar-nav-links">
+      <a href="../index.html">Início</a>
+      <a href="servicos.html" class="active">Serviços</a>
+      <a href="agendar.html">Agendar</a>
+      <a href="contato.html">Contato</a>
+    </nav>
+    <a href="agendar.html" class="topbar-action">Agendar</a>
+  </header>
+
+  <nav class="bottom-nav">
+    <a href="../index.html" class="bn-item"><span class="bn-icon">🏠</span><span>Início</span></a>
+    <a href="servicos.html" class="bn-item active"><span class="bn-icon">✂️</span><span>Serviços</span></a>
+    <a href="agendar.html" class="bn-item center-btn"><div class="bn-icon-wrap">📅</div><span>Agendar</span></a>
+    <a href="contato.html" class="bn-item"><span class="bn-icon">📍</span><span>Contato</span></a>
+  </nav>
+
+  <div class="page-wrap">
+    <section class="hero">
+      <div class="badge">💈 Catálogo de serviços</div>
+      <h1 class="gradient-text">Escolha o serviço ideal para o seu estilo.</h1>
+      <p>No <strong>Barbeiro Barril</strong> você encontra cortes, barba, combos e serviços especiais para manter o visual alinhado. Atendimento com <strong>Gilson Borges</strong> em Algodões.</p>
+    </section>
+
+    <div class="chips" id="chipsRow"></div>
+    <section class="grid" id="servicesGrid"></section>
+
+    <section class="faq-wrap">
+      <div class="section-label">Informações úteis</div>
+      <div class="faq-grid">
+        <div class="faq card">
+          <h3>Corte kids</h3>
+          <p>Esse serviço fica disponível somente às terças e quintas. No agendamento, o calendário libera apenas esses dias quando ele é selecionado.</p>
+        </div>
+        <div class="faq card">
+          <h3>Platinado</h3>
+          <p>O valor exibido é inicial. Dependendo do volume, tamanho e condição do cabelo, o serviço pode ter ajuste no preço final.</p>
+        </div>
+        <div class="faq card">
+          <h3>Horário de funcionamento</h3>
+          <p>A barbearia funciona de terça a domingo, das 8h às 17h. Segunda-feira é fechada.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-logo">Barbeiro Barril</div>
+      <div class="footer-links-row">
+        <a href="../index.html">Início</a>
+        <a href="servicos.html">Serviços</a>
+        <a href="agendar.html">Agendar</a>
+        <a href="contato.html">Contato</a>
+      </div>
+      <div class="footer-copy">© 2026 Barbeiro Barril · Atendimento com Gilson Borges</div>
+    </footer>
+  </div>
+
+  <script src="../js/data.js"></script>
+  <script>
+    let currentCategory = 'todos';
+
+    function renderChips() {
+      document.getElementById('chipsRow').innerHTML = AP.categories.map(c => `
+        <button class="chip ${currentCategory === c.id ? 'active' : ''}" onclick="setCategory('${c.id}')">${c.label}</button>
+      `).join('');
+    }
+
+    function setCategory(cat) {
+      currentCategory = cat;
+      renderChips();
+      renderServices();
+    }
+
+    function renderServices() {
+      const list = currentCategory === 'todos'
+        ? AP.services
+        : AP.services.filter(s => s.category === currentCategory);
+
+      document.getElementById('servicesGrid').innerHTML = list.map(s => `
+        <article class="item card">
+          <div class="item-media">${s.photo ? `<img src="${s.photo}" alt="${s.name}">` : 'Adicionar foto do serviço'}</div>
+          <div class="item-top">
+            <div>
+              <div class="item-meta">${s.dur} · ${AP.categories.find(c => c.id === s.category)?.label || 'Serviço'}</div>
+              <div class="item-title">${s.name}</div>
+            </div>
+            <div class="item-price">${AP.formatPrice(s.price)}</div>
+          </div>
+          <div class="item-desc">${s.desc}</div>
+          ${s.note ? `<div class="item-note">${s.note}</div>` : ''}
+          <a href="agendar.html?service=${s.id}" class="btn btn-outline btn-sm">Agendar este serviço</a>
+        </article>
+      `).join('');
+    }
+
+    renderChips();
+    renderServices();
+  </script>
+</body>
+</html>

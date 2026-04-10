@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#050505" />
+  <title>Contato — Barbeiro Barril</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .hero { max-width: 1100px; margin: 0 auto; padding: 32px 20px 12px; }
+    .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 8vw, 52px); margin: 10px 0; }
+    .hero p { color: var(--text2); line-height: 1.7; max-width: 720px; }
+    .grid { max-width: 1100px; margin: 0 auto; padding: 8px 20px 34px; display: grid; gap: 14px; }
+    .card-box { padding: 22px; }
+    .card-box h3 { font-size: 18px; margin-bottom: 8px; }
+    .card-box p { color: var(--text2); line-height: 1.7; font-size: 14px; }
+    .info-list { display: grid; gap: 12px; margin-top: 12px; }
+    .info-row {
+      background: var(--surface2); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px;
+      display: grid; gap: 4px;
+    }
+    .info-row strong { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .info-row span { color: var(--text); line-height: 1.6; }
+    .actions { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .schedule { display: grid; gap: 10px; margin-top: 14px; }
+    .schedule-row {
+      display: flex; justify-content: space-between; gap: 12px; align-items: center;
+      background: var(--surface2); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px;
+    }
+    .schedule-row span:last-child { color: var(--text2); font-weight: 700; }
+    .schedule-row.closed span:last-child { color: #fff; }
+    .note-card { padding: 22px; }
+    .note-card ul { margin-top: 12px; padding-left: 18px; color: var(--text2); line-height: 1.8; }
+    @media (min-width: 768px) {
+      .hero { padding: 50px 48px 16px; }
+      .grid { padding: 10px 48px 42px; grid-template-columns: 1.1fr .9fr; align-items: start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div></div>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <header class="topbar">
+    <a href="../index.html" class="topbar-logo">Barbeiro Barril</a>
+    <nav class="topbar-nav-links">
+      <a href="../index.html">Início</a>
+      <a href="servicos.html">Serviços</a>
+      <a href="agendar.html">Agendar</a>
+      <a href="contato.html" class="active">Contato</a>
+    </nav>
+    <a href="agendar.html" class="topbar-action">Agendar</a>
+  </header>
+
+  <nav class="bottom-nav">
+    <a href="../index.html" class="bn-item"><span class="bn-icon">🏠</span><span>Início</span></a>
+    <a href="servicos.html" class="bn-item"><span class="bn-icon">✂️</span><span>Serviços</span></a>
+    <a href="agendar.html" class="bn-item center-btn"><div class="bn-icon-wrap">📅</div><span>Agendar</span></a>
+    <a href="contato.html" class="bn-item active"><span class="bn-icon">📍</span><span>Contato</span></a>
+  </nav>
+
+  <div class="page-wrap">
+    <section class="hero">
+      <div class="badge">📍 Informações da barbearia</div>
+      <h1 class="gradient-text">Contato e localização</h1>
+      <p>Veja onde fica o <strong>Barbeiro Barril</strong>, confirme o horário de funcionamento e use o agendamento online para organizar seu atendimento com <strong>Gilson Borges</strong>.</p>
+    </section>
+
+    <section class="grid">
+      <div class="card-box card">
+        <h3>Onde estamos</h3>
+        <p>Atendimento em Algodões, Quijingue - BA, com estrutura voltada para cortes, barba e serviços de acabamento.</p>
+        <div class="info-list">
+          <div class="info-row">
+            <strong>Barbearia</strong>
+            <span>Barbeiro Barril</span>
+          </div>
+          <div class="info-row">
+            <strong>Barbeiro</strong>
+            <span>Gilson Borges</span>
+          </div>
+          <div class="info-row">
+            <strong>Endereço</strong>
+            <span>R. Sebastião José de Abreu - Algodões, Quijingue - BA, 48830-000</span>
+          </div>
+        </div>
+        <div class="actions">
+          <a href="#" id="mapsBtn" class="btn btn-primary">Abrir no mapa</a>
+          <a href="agendar.html" class="btn btn-outline">Ir para agendamento</a>
+        </div>
+      </div>
+
+      <div style="display:grid; gap:14px;">
+        <div class="card-box card">
+          <h3>Horário de atendimento</h3>
+          <div class="schedule">
+            <div class="schedule-row closed"><span>Segunda-feira</span><span>Fechado</span></div>
+            <div class="schedule-row"><span>Terça-feira</span><span>08:00 — 17:00</span></div>
+            <div class="schedule-row"><span>Quarta-feira</span><span>08:00 — 17:00</span></div>
+            <div class="schedule-row"><span>Quinta-feira</span><span>08:00 — 17:00</span></div>
+            <div class="schedule-row"><span>Sexta-feira</span><span>08:00 — 17:00</span></div>
+            <div class="schedule-row"><span>Sábado</span><span>08:00 — 17:00</span></div>
+            <div class="schedule-row"><span>Domingo</span><span>08:00 — 17:00</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-logo">Barbeiro Barril</div>
+      <div class="footer-links-row">
+        <a href="../index.html">Início</a>
+        <a href="servicos.html">Serviços</a>
+        <a href="agendar.html">Agendar</a>
+        <a href="contato.html">Contato</a>
+      </div>
+      <div class="footer-copy">© 2026 Barbeiro Barril · Atendimento com Gilson Borges</div>
+    </footer>
+  </div>
+
+  <script src="../js/data.js"></script>
+  <script>
+    document.getElementById('mapsBtn').href = AP.mapsLink();
+  </script>
+</body>
+</html>
